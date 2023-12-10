@@ -1,0 +1,14 @@
+spring:
+  liquibase:
+    enabled: true
+    drop-first: true
+
+
+  datasource:
+    username: skillbox
+    password: skillbox
+
+  jpa:
+    properties:
+      hibernate:
+        default_schema: skillbox

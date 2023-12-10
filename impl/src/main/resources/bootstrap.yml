@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: social.network
+
+  cloud:
+    kubernetes:
+      sources:
+        - name: social.network
+      secrets:
+        sources:
+          - name: social.network
+      reload:
+        enabled: true
+
+management:
+  endpoint:
+    restart:
+      enabled: true
+    health:
+      enabled: true
+    info:
+      enabled: true
+    prometheus:
+      enabled: true
+  tracing:
+    enabled: false
+    sampling:
+      probability: 1.0
+
+
+
+
