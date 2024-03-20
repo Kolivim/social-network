@@ -1,0 +1,106 @@
+name: Docker build
+
+on:
+  push:
+    branches: [ "2-add-github-cicd" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  docker_build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v3
+    - name: Set up JDK 18
+      uses: actions/setup-java@v3
+      with:
+        java-version: '18'
+        distribution: 'temurin'
+        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
+        settings-path: ${{ github.workspace }} # location for the settings.xml file
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml -e
+    - name: copy jar into .github/workspace "app/target/app-1.0-SNAPSHOT.jar"
+      run: pwd
+    - name: cd to copy jar into .github/workspace "app/target/app-1.0-SNAPSHOT.jar"
+      run: cd app && cd target && cp app-1.0-SNAPSHOT.jar ../../.github/workspace/tariffCalculator.jar && cd ../../.github/workspace && ls
+    # - name: copy jar into .github/workspace "app/target/app-1.0-SNAPSHOT.jar"
+    #   run: cp app/target/app-1.0-SNAPSHOT.jar /tariffCalculator.jar
+    - name: 2cd to copy jar into / "app/target/app-1.0-SNAPSHOT.jar"
+      run: cd app && cd target && cp app-1.0-SNAPSHOT.jar ../../tariffCalculator.jar && cd ../../ && ls
+    - name: ls /
+      run: ls -la
+    - name: ls .github/workspace
+      run: cd .github/workspace && ls -la
+
+
+
+    - name: cp staging
+      run: mkdir staging && cd app && cd target && cp app-1.0-SNAPSHOT.jar ../../staging/tariffCalculator.jar && cd ../../staging && ls
+    - uses: actions/upload-artifact@v4
+      with:
+        name: Package
+        path: staging
+
+
+    - name: Checkout
+      uses: actions/checkout@v4
+
+            # Output build artifacts to /github/workspace on the container.
+    # - name: Containerized Build
+    #   uses: ./.github/actions/my-container-action
+      
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3.0.0
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      with:
+          buildkitd-flags: --debug
+          # progress: plain
+
+    # - name: Buildx set
+    #   run: |
+    #       docker buildx build --load --progress=plain
+    # - name: Buildx set2
+    #   run: |
+    #       create --name builder1 --driver docker-container --progress=plain
+
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+    # - uses: actions/checkout@v4
+    # - name: Build the Docker image111
+    #   run: docker build . --file Dockerfile --platform linux/amd64 --progress=plain --no-cache
+
+    # - name: Upload Build Artifacts
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #       name: workspace_artifacts
+    #       path: ${{ github.workspace }}
+          
+    - name: Build and push
+      uses: docker/build-push-action@v5
+      with:
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/tariff-calculator:latest
+        context: .
+        # outputs: progress='plain'
+        # no-cache: true
+        cache-from: type=gha
+        cache-to: type=gha
+        # name: Package
+        # path: staging
+    - name: ls .github/workspace
+      run: cd .github/workspace && ls -la
+
+        
+        
+          
