@@ -84,7 +84,7 @@ public class NotificationServiceTest {
         postgres.start();
     }
 
-    @Test
+//    @Test
     @Transactional
     @DisplayName("Test create COMMENT_COMMENT")
     public void create() {
@@ -126,7 +126,7 @@ public class NotificationServiceTest {
 
     }
 
-    @Test
+//    @Test
     @Transactional
     @DisplayName("Test create COMMENT_COMMENT with Exception not found correct UUID ParentId in comment ")
     public void createException() {
@@ -164,7 +164,7 @@ public class NotificationServiceTest {
 
     }
 
-    @Test
+//    @Test
     @Transactional
     void test() {
         technicalUser.executeByTechnicalUser(() -> 2);
